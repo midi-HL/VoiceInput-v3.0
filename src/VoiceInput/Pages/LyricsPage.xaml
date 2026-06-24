@@ -7,7 +7,7 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <Grid Padding="12" Spacing="24">
+    <Grid Padding="12" RowSpacing="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
