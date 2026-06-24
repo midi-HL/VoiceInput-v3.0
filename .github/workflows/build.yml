@@ -23,10 +23,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore src/VoiceInput
+      run: dotnet restore src/VoiceInput -r win-x64
 
     - name: Build
-      run: dotnet build src/VoiceInput --configuration Release --no-restore
+      run: dotnet build src/VoiceInput --configuration Release -r win-x64 --no-restore
 
     - name: Publish
       run: |
