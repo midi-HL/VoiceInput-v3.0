@@ -9,6 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>VoiceInput</RootNamespace>
     <AssemblyName>VoiceInput</AssemblyName>
+    <UseRidGraph>true</UseRidGraph>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.240802001" />
