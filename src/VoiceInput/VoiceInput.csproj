@@ -9,6 +9,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>VoiceInput</RootNamespace>
     <AssemblyName>VoiceInput</AssemblyName>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Platforms>x64</Platforms>
     <UseRidGraph>true</UseRidGraph>
   </PropertyGroup>
   <ItemGroup>
