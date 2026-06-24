@@ -11,6 +11,19 @@ public partial class SubtitlePage : Page
 {
     private readonly StringBuilder _allSubtitles = new();
 
+    private Paragraph ContentParagraph
+    {
+        get
+        {
+            if (SubtitleBox.Blocks.Count == 0)
+            {
+                var p = new Paragraph { FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe UI Variable"), FontSize = 16, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255)) };
+                SubtitleBox.Blocks.Add(p);
+            }
+            return (Paragraph)SubtitleBox.Blocks[0];
+        }
+    }
+
     public SubtitlePage()
     {
         this.InitializeComponent();

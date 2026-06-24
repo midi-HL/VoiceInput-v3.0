@@ -56,7 +56,7 @@
 
                 <!-- Footer Setting -->
                 <StackPanel Grid.Row="2" Spacing="4">
-                    <MenuFlyoutSeparator Background="#2A2A2A" Margin="0,0,0,12" />
+                    <Border Height="1" Background="#2A2A2A" Margin="0,0,0,12" />
                     <Button x:Name="SettingsBtn" Click="OnNavClick" Tag="Settings" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,8" Background="Transparent" BorderThickness="0" CornerRadius="4">
                         <StackPanel Orientation="Horizontal" Spacing="12">
                             <FontIcon Glyph="&#xE713;" FontSize="16" Foreground="#999999" />

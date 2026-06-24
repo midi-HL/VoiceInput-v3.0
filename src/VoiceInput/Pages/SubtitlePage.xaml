@@ -47,7 +47,7 @@
         <Border Grid.Row="3" Background="#1E1E1E" CornerRadius="8" Padding="20">
             <ScrollViewer x:Name="ScrollContainer" VerticalScrollBarVisibility="Auto">
                 <RichTextBlock x:Name="SubtitleBox" LineHeight="28" LineStackingStrategy="MaxHeight">
-                    <Paragraph x:Name="ContentParagraph" FontFamily="Segoe UI Variable" FontSize="16" Foreground="#FFFFFF">
+                    <Paragraph FontFamily="Segoe UI Variable" FontSize="16" Foreground="#FFFFFF">
                         <Run Text="字幕内容将在这里实时显示..." Foreground="#555555" />
                     </Paragraph>
                 </RichTextBlock>
