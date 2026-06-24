@@ -23,16 +23,16 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore src/VoiceInput -r win-x64 /p:Platform=x64
+      run: dotnet restore src/VoiceInput/VoiceInput.csproj -r win-x64 /p:Platform=x64
 
     - name: Build
-      run: dotnet build src/VoiceInput --configuration Release -r win-x64 /p:Platform=x64 --no-restore
+      run: dotnet build src/VoiceInput/VoiceInput.csproj --configuration Release -r win-x64 /p:Platform=x64 --no-restore
 
     - name: Publish
       run: |
         # Use a fallback version like 1.0.0 if not running on a tag
         $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "1.0.0" }
-        dotnet publish src/VoiceInput --configuration Release --output publish --self-contained true --runtime win-x64 /p:Platform=x64 --verbosity minimal /p:Version=$version
+        dotnet publish src/VoiceInput/VoiceInput.csproj --configuration Release --output publish --self-contained true --runtime win-x64 /p:Platform=x64 --verbosity minimal /p:Version=$version
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
