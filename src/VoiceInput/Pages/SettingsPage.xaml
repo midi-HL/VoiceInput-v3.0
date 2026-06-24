@@ -1,0 +1,95 @@
+<Page
+    x:Class="VoiceInput.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Padding="12,12,24,24" RowSpacing="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="设置" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" />
+
+            <!-- Group 1: API Config -->
+            <Border Grid.Row="1" Background="#1C1C1C" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="MiMo API 配置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
+                    
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="API Key" FontSize="14" Foreground="#FFFFFF" />
+                        <PasswordBox x:Name="ApiKeyBox" PasswordChar="●" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                        <TextBlock Text="提示：自 MiMo 开放平台注册并获取密钥" FontSize="12" Foreground="#999999" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Button Content="测试连接" Click="OnTestConnectionClick" Background="#2A2A2A" Foreground="#FFFFFF" BorderThickness="0" Padding="16,6" />
+                        <TextBlock x:Name="TestResultTxt" Text="" FontSize="13" Foreground="#999999" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Group 2: Recognition Settings -->
+            <Border Grid.Row="2" Background="#1C1C1C" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="识别设置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="识别语言" FontSize="14" Foreground="#FFFFFF" />
+                        <RadioButton x:Name="LangAutoBtn" Content="自动检测 (auto)" GroupName="AsrLanguage" IsChecked="True" Foreground="#FFFFFF" />
+                        <RadioButton x:Name="LangZhBtn" Content="中文 (zh)" GroupName="AsrLanguage" Foreground="#FFFFFF" />
+                        <RadioButton x:Name="LangEnBtn" Content="英文 (en)" GroupName="AsrLanguage" Foreground="#FFFFFF" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6" Width="300" HorizontalAlignment="Left">
+                        <TextBlock Text="触发按键" FontSize="14" Foreground="#FFFFFF" />
+                        <ComboBox x:Name="HotkeyCombo" HorizontalAlignment="Stretch" Background="#2A2A2A" Foreground="#FFFFFF" BorderThickness="0">
+                            <ComboBoxItem Content="右 Alt 键" Tag="RightAlt" IsSelected="True" />
+                            <ComboBoxItem Content="左 Alt 键" Tag="LeftAlt" />
+                            <ComboBoxItem Content="Space 键" Tag="Space" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="LLM 纠错" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        <ToggleSwitch x:Name="LlmCorrectionSwitch" IsOn="True" OnContent="开启" OffContent="关闭" Foreground="#FFFFFF" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Group 3: Display Preferences -->
+            <Border Grid.Row="3" Background="#1C1C1C" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="界面与显示" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="界面语言" FontSize="14" Foreground="#FFFFFF" />
+                        <RadioButton x:Name="UiZhBtn" Content="简体中文" GroupName="UiLanguage" IsChecked="True" Foreground="#FFFFFF" />
+                        <RadioButton x:Name="UiEnBtn" Content="English" GroupName="UiLanguage" Foreground="#FFFFFF" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6" Width="400" HorizontalAlignment="Left">
+                        <TextBlock Text="HUD 位置偏移（距屏幕底部）" FontSize="14" Foreground="#FFFFFF" />
+                        <Slider x:Name="HudOffsetSlider" Minimum="16" Maximum="120" Value="32" StepFrequency="4" Foreground="#0078D4" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom Action Controls -->
+            <Grid Grid.Row="4" Margin="0,12,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                    <Button Content="保存设置" Click="OnSaveClick" Background="#0078D4" Foreground="#FFFFFF" BorderThickness="0" Padding="24,8" />
+                    <Button Content="取消" Click="OnCancelClick" Background="Transparent" BorderBrush="#555555" BorderThickness="1" Foreground="#FFFFFF" Padding="24,8" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

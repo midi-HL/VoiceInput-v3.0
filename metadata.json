@@ -1,0 +1,6 @@
+{
+  "name": "Windows Voice Input Developer Suite",
+  "description": "An interactive workspace, simulator, and code explorer for building a Windows System Tray voice input method application using .NET 8, WinUI 3, and MiMo-V2.5-ASR.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
