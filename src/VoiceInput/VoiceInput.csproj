@@ -9,9 +9,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>VoiceInput</RootNamespace>
     <AssemblyName>VoiceInput</AssemblyName>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <Platforms>x64</Platforms>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <Platforms>x64</Platforms>
     <UseRidGraph>true</UseRidGraph>
   </PropertyGroup>
   <ItemGroup>
