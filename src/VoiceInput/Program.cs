@@ -19,7 +19,7 @@ internal static class Program
             return;
         }
 
-        WinRT.ComWrappers.InitializeComWrappers();
+        global::WinRT.ComWrappersSupport.InitializeComWrappers();
         Application.Start((p) =>
         {
             var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
