@@ -32,6 +32,7 @@ public partial class HudWindow : Window
     public HudWindow()
     {
         this.InitializeComponent();
+        this.ExtendsContentIntoTitleBar = true;
 
         IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
