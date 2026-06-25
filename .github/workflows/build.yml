@@ -22,31 +22,33 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+    # 如果是 WinUI 3 项目，发布时可能需要还原特定的工作负载
+    - name: Install .NET Workloads (Optional)
+      run: dotnet workload restore src/VoiceInput/VoiceInput.csproj
 
     - name: Restore dependencies
-      run: msbuild src/VoiceInput/VoiceInput.csproj /t:restore /p:Configuration=Release /p:Platform=x64
+      run: dotnet restore src/VoiceInput/VoiceInput.csproj -p:Configuration=Release -p:Platform=x64
 
     - name: Build
-      run: msbuild src/VoiceInput/VoiceInput.csproj /p:Configuration=Release /p:Platform=x64
+      run: dotnet build src/VoiceInput/VoiceInput.csproj --no-restore -c Release -p:Platform=x64
 
+    # 使用现代 dotnet publish 替代 msbuild /t:Publish
     - name: Publish
+      shell: pwsh
       run: |
-        # Use a fallback version like 1.0.0 if not running on a tag
-        $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "1.0.0" }
-        msbuild src/VoiceInput/VoiceInput.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishDir="${{ github.workspace }}/publish/" /p:SelfContained=true /p:Version=$version /t:Publish
+        $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart('v') } else { "1.0.0" }
+        dotnet publish src/VoiceInput/VoiceInput.csproj -c Release -p:Platform=x64 -r win-x64 -o "${{ github.workspace }}/publish/" --self-contained true -p:Version=$version
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: VoiceInput-win-x64
-        path: publish/
+        path: ${{ github.workspace }}/publish/
 
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        files: publish/*
+        files: ${{ github.workspace }}/publish/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
