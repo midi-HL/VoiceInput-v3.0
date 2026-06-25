@@ -40,7 +40,7 @@ jobs:
       run: dotnet restore src/VoiceInput/VoiceInput.csproj -p:Configuration=Release -p:Platform=x64
 
     - name: Build
-      run: dotnet build src/VoiceInput/VoiceInput.csproj --no-restore -c Release -p:Platform=x64
+      run: dotnet build src/VoiceInput/VoiceInput.csproj --no-restore -c Release -p:Platform=x64 /v:n
 
     # 使用现代 dotnet publish 替代传统 msbuild 发布的步骤
     - name: Publish
