@@ -14,6 +14,11 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        this.UnhandledException += (sender, e) =>
+        {
+            Program.HandleCrash(e.Exception);
+            e.Handled = true;
+        };
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
