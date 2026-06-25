@@ -22,12 +22,30 @@
             <!-- Group 1: API Config -->
             <Border Grid.Row="1" Background="#1C1C1C" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
-                    <TextBlock Text="MiMo API 配置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
-                    
+                    <TextBlock Text="ASR 语音识别配置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
+
+                    <StackPanel Spacing="6" Width="300" HorizontalAlignment="Left">
+                        <TextBlock Text="ASR 服务商" FontSize="14" Foreground="#FFFFFF" />
+                        <ComboBox x:Name="AsrProviderCombo" HorizontalAlignment="Stretch" Background="#2A2A2A" Foreground="#FFFFFF" BorderThickness="0" SelectionChanged="OnAsrProviderChanged">
+                            <ComboBoxItem Content="MiMo 开放平台" Tag="mimo" />
+                            <ComboBoxItem Content="OpenAI Whisper" Tag="openai" />
+                            <ComboBoxItem Content="自定义/其他" Tag="custom" />
+                        </ComboBox>
+                    </StackPanel>
+
                     <StackPanel Spacing="6">
-                        <TextBlock Text="API Key" FontSize="14" Foreground="#FFFFFF" />
-                        <PasswordBox x:Name="ApiKeyBox" PasswordChar="●" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
-                        <TextBlock Text="提示：自 MiMo 开放平台注册并获取密钥" FontSize="12" Foreground="#999999" />
+                        <TextBlock Text="ASR API 地址" FontSize="14" Foreground="#FFFFFF" />
+                        <TextBox x:Name="AsrBaseUrlBox" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="ASR API Key" FontSize="14" Foreground="#FFFFFF" />
+                        <PasswordBox x:Name="AsrApiKeyBox" PasswordChar="●" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="ASR 模型名称" FontSize="14" Foreground="#FFFFFF" />
+                        <TextBox x:Name="AsrModelNameBox" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
@@ -40,7 +58,7 @@
             <!-- Group 2: Recognition Settings -->
             <Border Grid.Row="2" Background="#1C1C1C" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
-                    <TextBlock Text="识别设置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
+                    <TextBlock Text="识别与纠错设置" FontSize="14" FontWeight="Bold" Foreground="#0078D4" />
 
                     <StackPanel Spacing="8">
                         <TextBlock Text="识别语言" FontSize="14" Foreground="#FFFFFF" />
@@ -60,7 +78,45 @@
 
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="LLM 纠错" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
-                        <ToggleSwitch x:Name="LlmCorrectionSwitch" IsOn="True" OnContent="开启" OffContent="关闭" Foreground="#FFFFFF" />
+                        <ToggleSwitch x:Name="LlmCorrectionSwitch" IsOn="True" OnContent="开启" OffContent="关闭" Foreground="#FFFFFF" Toggled="OnLlmCorrectionToggled" />
+                    </StackPanel>
+
+                    <!-- Collapsible LLM Config Panel -->
+                    <StackPanel x:Name="LlmDetailsPanel" Spacing="16" Visibility="Visible">
+                        <StackPanel Spacing="6" Width="300" HorizontalAlignment="Left">
+                            <TextBlock Text="LLM 服务商" FontSize="14" Foreground="#FFFFFF" />
+                            <ComboBox x:Name="LlmProviderCombo" HorizontalAlignment="Stretch" Background="#2A2A2A" Foreground="#FFFFFF" BorderThickness="0" SelectionChanged="OnLlmProviderChanged">
+                                <ComboBoxItem Content="MiMo 开放平台" Tag="mimo" />
+                                <ComboBoxItem Content="OpenAI API" Tag="openai" />
+                                <ComboBoxItem Content="Google Gemini" Tag="gemini" />
+                                <ComboBoxItem Content="自定义/其他" Tag="custom" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="LLM API 地址" FontSize="14" Foreground="#FFFFFF" />
+                            <TextBox x:Name="LlmBaseUrlBox" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="LLM API Key" FontSize="14" Foreground="#FFFFFF" />
+                            <PasswordBox x:Name="LlmApiKeyBox" PasswordChar="●" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="LLM 模型名称" FontSize="14" Foreground="#FFFFFF" />
+                            <TextBox x:Name="LlmModelNameBox" Width="400" HorizontalAlignment="Left" Background="#2A2A2A" BorderThickness="1" Foreground="#FFFFFF" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6" Width="300" HorizontalAlignment="Left">
+                            <TextBlock Text="纠错模式" FontSize="14" Foreground="#FFFFFF" />
+                            <ComboBox x:Name="LlmModeCombo" HorizontalAlignment="Stretch" Background="#2A2A2A" Foreground="#FFFFFF" BorderThickness="0">
+                                <ComboBoxItem Content="轻量纠错 (Standard)" Tag="standard" />
+                                <ComboBoxItem Content="商务办公 (Professional)" Tag="professional" />
+                                <ComboBoxItem Content="学术严谨 (Academic)" Tag="academic" />
+                                <ComboBoxItem Content="原生口语 (Colloquial)" Tag="colloquial" />
+                            </ComboBox>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </Border>

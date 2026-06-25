@@ -12,29 +12,39 @@ public static class SecureStorage
 
     public static void SaveApiKey(string apiKey)
     {
+        SaveSecret(ApiKeyValName, apiKey);
+    }
+
+    public static string LoadApiKey()
+    {
+        return LoadSecret(ApiKeyValName);
+    }
+
+    public static void SaveSecret(string valName, string secret)
+    {
         try
         {
-            byte[] data = Encoding.UTF8.GetBytes(apiKey);
+            byte[] data = Encoding.UTF8.GetBytes(secret);
             byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
             
             using var key = Registry.CurrentUser.CreateSubKey(RegistryKeyPath);
             if (key != null)
             {
-                key.SetValue(ApiKeyValName, encrypted, RegistryValueKind.Binary);
+                key.SetValue(valName, encrypted, RegistryValueKind.Binary);
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error encrypting API Key: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error encrypting {valName}: {ex.Message}");
         }
     }
 
-    public static string LoadApiKey()
+    public static string LoadSecret(string valName)
     {
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
-            if (key?.GetValue(ApiKeyValName) is byte[] encrypted)
+            if (key?.GetValue(valName) is byte[] encrypted)
             {
                 byte[] data = ProtectedData.Unprotect(encrypted, null, DataProtectionScope.CurrentUser);
                 return Encoding.UTF8.GetString(data);
@@ -42,7 +52,7 @@ public static class SecureStorage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error decrypting API Key: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error decrypting {valName}: {ex.Message}");
         }
         return string.Empty;
     }

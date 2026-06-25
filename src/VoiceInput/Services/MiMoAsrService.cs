@@ -16,19 +16,33 @@ public class MiMoAsrService
         _httpClient = new HttpClient();
     }
 
+    private void ApplyAuth(HttpRequestMessage request, string apiKey, string provider)
+    {
+        if (provider == "mimo")
+        {
+            request.Headers.Add("api-key", apiKey);
+        }
+        else
+        {
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+        }
+    }
+
     public async Task<string> RecognizeAsync(string base64Audio, string mimeType = "audio/wav", string language = "auto", string? customApiKey = null)
     {
-        string apiKey = customApiKey ?? Helpers.SecureStorage.LoadApiKey();
+        var settings = Helpers.Settings.Instance.Current;
+        string apiKey = !string.IsNullOrEmpty(customApiKey) ? customApiKey : settings.AsrApiKey;
         if (string.IsNullOrEmpty(apiKey))
         {
             throw new InvalidOperationException("API Key is missing. Please configure it in settings.");
         }
 
         string dataUrl = $"data:{mimeType};base64,{base64Audio}";
+        string model = settings.AsrModelName;
 
         var requestBody = new
         {
-            model = "mimo-v2.5-asr",
+            model = model,
             messages = new[]
             {
                 new
@@ -54,12 +68,14 @@ public class MiMoAsrService
         };
 
         string json = JsonSerializer.Serialize(requestBody);
-        using var content = new StringContent(json, Encoding.UTF8, "application/json");
-        content.Headers.Add("api-key", apiKey);
+        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
+        string requestUrl = $"{baseUrl}/chat/completions";
 
-        var response = await _httpClient.PostAsync(
-            "https://api.xiaomimimo.com/v1/chat/completions", 
-            content);
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        ApplyAuth(request, apiKey, settings.AsrProvider);
+
+        var response = await _httpClient.SendAsync(request);
         
         response.EnsureSuccessStatusCode();
         string responseJson = await response.Content.ReadAsStringAsync();
@@ -81,17 +97,19 @@ public class MiMoAsrService
         string language = "auto",
         string? customApiKey = null)
     {
-        string apiKey = customApiKey ?? Helpers.SecureStorage.LoadApiKey();
+        var settings = Helpers.Settings.Instance.Current;
+        string apiKey = !string.IsNullOrEmpty(customApiKey) ? customApiKey : settings.AsrApiKey;
         if (string.IsNullOrEmpty(apiKey))
         {
             throw new InvalidOperationException("API Key is missing. Please configure it in settings.");
         }
 
         string dataUrl = $"data:{mimeType};base64,{base64Audio}";
+        string model = settings.AsrModelName;
 
         var requestBody = new
         {
-            model = "mimo-v2.5-asr",
+            model = model,
             messages = new[]
             {
                 new
@@ -112,9 +130,12 @@ public class MiMoAsrService
         };
 
         string json = JsonSerializer.Serialize(requestBody);
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.xiaomimimo.com/v1/chat/completions");
+        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
+        string requestUrl = $"{baseUrl}/chat/completions";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-        request.Content.Headers.Add("api-key", apiKey);
+        ApplyAuth(request, apiKey, settings.AsrProvider);
 
         using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();

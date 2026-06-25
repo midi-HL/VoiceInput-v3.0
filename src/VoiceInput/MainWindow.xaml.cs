@@ -18,6 +18,9 @@ public partial class MainWindow : Window
     {
         this.InitializeComponent();
         
+        // Set window size programmatically
+        this.AppWindow.Resize(new Windows.Graphics.SizeInt32(900, 600));
+        
         this.Title = "语音输入";
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(null);

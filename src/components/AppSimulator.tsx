@@ -16,11 +16,46 @@ export default function AppSimulator() {
   });
 
   // Settings state
+  const [asrProvider, setAsrProvider] = useState<string>('mimo');
+  const [asrBaseUrl, setAsrBaseUrl] = useState<string>('https://api.xiaomimimo.com/v1');
   const [apiKey, setApiKey] = useState<string>('mimo_sk_82f1a94bb2e841f4a6');
+  const [asrModelName, setAsrModelName] = useState<string>('mimo-v2.5-asr');
+
   const [asrLanguage, setAsrLanguage] = useState<string>('auto');
   const [hotkey, setHotkey] = useState<string>('RightAlt');
   const [enableLlm, setEnableLlm] = useState<boolean>(true);
   const [showSavedNotification, setShowSavedNotification] = useState<boolean>(false);
+
+  const [llmProvider, setLlmProvider] = useState<string>('mimo');
+  const [llmBaseUrl, setLlmBaseUrl] = useState<string>('https://api.xiaomimimo.com/v1');
+  const [llmApiKey, setLlmApiKey] = useState<string>('mimo_sk_llm_a189fcd803d');
+  const [llmModelName, setLlmModelName] = useState<string>('gpt-3.5-turbo');
+  const [llmCorrectionMode, setLlmCorrectionMode] = useState<string>('standard');
+
+  const handleAsrProviderChange = (provider: string) => {
+    setAsrProvider(provider);
+    if (provider === 'mimo') {
+      setAsrBaseUrl('https://api.xiaomimimo.com/v1');
+      setAsrModelName('mimo-v2.5-asr');
+    } else if (provider === 'openai') {
+      setAsrBaseUrl('https://api.openai.com/v1');
+      setAsrModelName('whisper-1');
+    }
+  };
+
+  const handleLlmProviderChange = (provider: string) => {
+    setLlmProvider(provider);
+    if (provider === 'mimo') {
+      setLlmBaseUrl('https://api.xiaomimimo.com/v1');
+      setLlmModelName('gpt-3.5-turbo');
+    } else if (provider === 'openai') {
+      setLlmBaseUrl('https://api.openai.com/v1');
+      setLlmModelName('gpt-4o-mini');
+    } else if (provider === 'gemini') {
+      setLlmBaseUrl('https://generativelanguage.googleapis.com/v1beta');
+      setLlmModelName('gemini-2.5-flash');
+    }
+  };
 
   // Lyrics simulation state
   const [lyricFile, setLyricFile] = useState<string | null>(null);
@@ -62,11 +97,19 @@ export default function AppSimulator() {
 
         if (enableLlm) {
           setTimeout(() => {
+            let corrected = '今天，我们来解决 XamlCompiler 进程在 Release 增量编译时的崩溃问题。';
+            if (llmCorrectionMode === 'professional') {
+              corrected = '大家上午好。今天我们主要讨论并解决 XamlCompiler 进程在 Release 模式下执行增量编译时崩溃的异常技术故障。';
+            } else if (llmCorrectionMode === 'academic') {
+              corrected = '本报告旨在针对 XamlCompiler 进程于 Release 增量编译环境下发生的崩溃故障提出并实施容错性处理方案。';
+            } else if (llmCorrectionMode === 'colloquial') {
+              corrected = '哎呀今天，我们来解决一下那啥，XamlCompiler 进程在那个 Release 增量编译的时候崩溃的问题哈。';
+            }
             setState(prev => ({
               ...prev,
               isProcessing: false,
               isCorrected: true,
-              correctedText: '今天，我们来解决 XamlCompiler 进程在 Release 增量编译时的崩溃问题。',
+              correctedText: corrected,
               statusText: '就绪'
             }));
           }, 1500);
@@ -368,28 +411,69 @@ export default function AppSimulator() {
                 <div>
                   <h3 className="text-base font-bold text-white">系统运行设置</h3>
                   <p className="text-xs text-gray-500 mt-1">
-                    调整本地 Windows 客户端的识别属性。
+                    调整本地 Windows 客户端的识别与纠错属性。
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs text-gray-400 block mb-1">MiMo API 密钥</label>
-                    <input
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500"
-                    />
+                <div className="space-y-4 overflow-y-auto max-h-[340px] pr-1">
+                  {/* ASR Group */}
+                  <div className="space-y-2.5 p-3 bg-[#1C1C1E] border border-[#2D2D30] rounded-lg">
+                    <h4 className="text-xs font-bold text-blue-400">ASR 语音识别配置</h4>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-1">ASR 服务商</label>
+                        <select
+                          value={asrProvider}
+                          onChange={(e) => handleAsrProviderChange(e.target.value)}
+                          className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1 text-xs text-white focus:outline-none"
+                        >
+                          <option value="mimo">MiMo 开放平台</option>
+                          <option value="openai">OpenAI Whisper</option>
+                          <option value="custom">自定义/其他</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-1">ASR 模型名称</label>
+                        <input
+                          type="text"
+                          value={asrModelName}
+                          onChange={(e) => setAsrModelName(e.target.value)}
+                          className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-gray-400 block mb-1">ASR API 地址</label>
+                      <input
+                        type="text"
+                        value={asrBaseUrl}
+                        onChange={(e) => setAsrBaseUrl(e.target.value)}
+                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-gray-400 block mb-1">ASR API 密钥</label>
+                      <input
+                        type="password"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                      />
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* General Recognition Settings */}
+                  <div className="grid grid-cols-2 gap-3 p-3 bg-[#1C1C1E] border border-[#2D2D30] rounded-lg">
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">识别目标语言</label>
                       <select
                         value={asrLanguage}
                         onChange={(e) => setAsrLanguage(e.target.value)}
-                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1 text-xs text-white focus:outline-none"
                       >
                         <option value="auto">自动识别 (Auto)</option>
                         <option value="zh">仅中文 (zh)</option>
@@ -402,7 +486,7 @@ export default function AppSimulator() {
                       <select
                         value={hotkey}
                         onChange={(e) => setHotkey(e.target.value)}
-                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1 text-xs text-white focus:outline-none"
                       >
                         <option value="RightAlt">右 Alt 键</option>
                         <option value="LeftAlt">左 Alt 键</option>
@@ -411,17 +495,90 @@ export default function AppSimulator() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-[#2D2D30] pt-3.5">
-                    <div>
-                      <h4 className="text-xs font-semibold text-white">智能大语言模型（LLM）文字纠错</h4>
-                      <p className="text-[10px] text-gray-500 mt-0.5">对识别结果进行标点修饰、语气词删除与逻辑润色。</p>
+                  {/* LLM Correction Group */}
+                  <div className="p-3 bg-[#1C1C1E] border border-[#2D2D30] rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-xs font-semibold text-white">智能大语言模型（LLM）文字纠错</h4>
+                        <p className="text-[10px] text-gray-500 mt-0.5">对识别结果进行标点修饰与逻辑润色。</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={enableLlm}
+                        onChange={(e) => setEnableLlm(e.target.checked)}
+                        className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
+                      />
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={enableLlm}
-                      onChange={(e) => setEnableLlm(e.target.checked)}
-                      className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
-                    />
+
+                    {enableLlm && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="space-y-2.5 pt-2 border-t border-[#2D2D30]/60 overflow-hidden"
+                      >
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] text-gray-400 block mb-1">LLM 服务商</label>
+                            <select
+                              value={llmProvider}
+                              onChange={(e) => handleLlmProviderChange(e.target.value)}
+                              className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1 text-xs text-white focus:outline-none"
+                            >
+                              <option value="mimo">MiMo 开放平台</option>
+                              <option value="openai">OpenAI API</option>
+                              <option value="gemini">Google Gemini</option>
+                              <option value="custom">自定义/其他</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] text-gray-400 block mb-1">LLM 纠错模式</label>
+                            <select
+                              value={llmCorrectionMode}
+                              onChange={(e) => setLlmCorrectionMode(e.target.value)}
+                              className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-2.5 py-1 text-xs text-white focus:outline-none"
+                            >
+                              <option value="standard">轻量纠错 (Standard)</option>
+                              <option value="professional">商务办公 (Professional)</option>
+                              <option value="academic">学术严谨 (Academic)</option>
+                              <option value="colloquial">原生口语 (Colloquial)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] text-gray-400 block mb-1">LLM 模型名称</label>
+                            <input
+                              type="text"
+                              value={llmModelName}
+                              onChange={(e) => setLlmModelName(e.target.value)}
+                              className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] text-gray-400 block mb-1">LLM API Key</label>
+                            <input
+                              type="password"
+                              value={llmApiKey}
+                              onChange={(e) => setLlmApiKey(e.target.value)}
+                              className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-gray-400 block mb-1">LLM API 地址</label>
+                          <input
+                            type="text"
+                            value={llmBaseUrl}
+                            onChange={(e) => setLlmBaseUrl(e.target.value)}
+                            className="w-full bg-[#18181A] border border-[#2D2D30] rounded px-3 py-1 text-xs text-white font-mono focus:outline-none"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 </div>
               </div>

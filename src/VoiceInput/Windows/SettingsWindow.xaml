@@ -5,11 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="设置 - 语音输入"
-    Width="640"
-    Height="600"
-    MinWidth="500"
-    MinHeight="450">
+    Title="设置 - 语音输入">
 
     <Grid Background="#121212">
         <Frame x:Name="SettingsFrame" Padding="24" />
