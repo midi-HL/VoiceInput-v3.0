@@ -22,8 +22,18 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # 如果是 WinUI 3 项目，发布时可能需要还原特定的工作负载
-    - name: Install .NET Workloads (Optional)
+    # 安装 WinUI 3 XamlCompiler 所需的 C++ 核心工具集和桌面开发依赖
+    - name: Install Windows App SDK Build Tools Dependencies
+      shell: powershell
+      run: |
+        & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify `
+        --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" `
+        --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+        --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
+        --quiet --norestart
+
+    # 如果是 WinUI 3 项目，发布时还原可能需要的工作负载
+    - name: Install .NET Workloads
       run: dotnet workload restore src/VoiceInput/VoiceInput.csproj
 
     - name: Restore dependencies
@@ -32,7 +42,7 @@ jobs:
     - name: Build
       run: dotnet build src/VoiceInput/VoiceInput.csproj --no-restore -c Release -p:Platform=x64
 
-    # 使用现代 dotnet publish 替代 msbuild /t:Publish
+    # 使用现代 dotnet publish 替代传统 msbuild 发布的步骤
     - name: Publish
       shell: pwsh
       run: |
