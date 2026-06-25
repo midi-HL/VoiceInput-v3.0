@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using VoiceInput.Services;
 
 namespace VoiceInput.Pages;
 
@@ -51,7 +52,7 @@ public partial class LyricsPage : Page
         if (_selectedFilePath != null) return;
 
         var picker = new FileOpenPicker();
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.Current.As<App>()._mainWindow);
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(((App)Application.Current)._mainWindow);
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
         picker.ViewMode = PickerViewMode.List;
@@ -153,7 +154,7 @@ public partial class LyricsPage : Page
     private async void OnExportClick(object sender, RoutedEventArgs e)
     {
         var picker = new FileSavePicker();
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.Current.As<App>()._mainWindow);
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(((App)Application.Current)._mainWindow);
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
         picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;

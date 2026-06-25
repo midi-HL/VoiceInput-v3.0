@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoiceInput.Services;
 
-public class LlmRefiner
+public class LlmRefiner : ILlmService
 {
     private readonly HttpClient _httpClient;
     private const string PROMPT_STANDARD = @"你是语音转录后处理助手。
@@ -79,7 +79,15 @@ public class LlmRefiner
 
             string json = JsonSerializer.Serialize(requestBody);
             string baseUrl = settings.LlmBaseUrl.TrimEnd('/');
-            string requestUrl = $"{baseUrl}/chat/completions";
+            string requestUrl;
+            if (settings.LlmProvider == "gemini" && baseUrl.Contains("generativelanguage.googleapis.com"))
+            {
+                requestUrl = $"{baseUrl}/openai/chat/completions";
+            }
+            else
+            {
+                requestUrl = $"{baseUrl}/chat/completions";
+            }
 
             using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");

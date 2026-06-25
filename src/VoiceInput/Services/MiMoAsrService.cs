@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VoiceInput.Services;
 
-public class MiMoAsrService
+public class MiMoAsrService : IAsrService
 {
     private readonly HttpClient _httpClient;
 
@@ -32,62 +32,83 @@ public class MiMoAsrService
     {
         var settings = Helpers.Settings.Instance.Current;
         string apiKey = !string.IsNullOrEmpty(customApiKey) ? customApiKey : settings.AsrApiKey;
-        if (string.IsNullOrEmpty(apiKey))
+        string provider = settings.AsrProvider;
+        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
+        string model = settings.AsrModelName;
+
+        if (string.IsNullOrEmpty(apiKey) && provider != "custom")
         {
             throw new InvalidOperationException("API Key is missing. Please configure it in settings.");
         }
 
-        string dataUrl = $"data:{mimeType};base64,{base64Audio}";
-        string model = settings.AsrModelName;
-
-        var requestBody = new
+        if (provider == "openai" || (provider == "custom" && (baseUrl.Contains("audio") || model.Contains("whisper"))))
         {
-            model = model,
-            messages = new[]
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/audio/transcriptions");
+            if (!string.IsNullOrEmpty(apiKey))
             {
-                new
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+            }
+
+            var multipart = new MultipartFormDataContent();
+            byte[] audioBytes = Convert.FromBase64String(base64Audio);
+            var fileContent = new ByteArrayContent(audioBytes);
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mimeType);
+            multipart.Add(fileContent, "file", mimeType.Contains("wav") ? "audio.wav" : "audio.mp3");
+            multipart.Add(new StringContent(model), "model");
+
+            if (!string.IsNullOrEmpty(language) && language != "auto")
+            {
+                multipart.Add(new StringContent(language), "language");
+            }
+
+            request.Content = multipart;
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            string responseJson = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(responseJson);
+            return doc.RootElement.GetProperty("text").GetString() ?? string.Empty;
+        }
+        else
+        {
+            string dataUrl = $"data:{mimeType};base64,{base64Audio}";
+            var requestBody = new
+            {
+                model = model,
+                messages = new[]
                 {
-                    role = "user",
-                    content = new object[]
+                    new
                     {
-                        new
+                        role = "user",
+                        content = new object[]
                         {
-                            type = "input_audio",
-                            input_audio = new
+                            new
                             {
-                                data = dataUrl
+                                type = "input_audio",
+                                input_audio = new { data = dataUrl }
                             }
                         }
                     }
-                }
-            },
-            asr_options = new
-            {
-                language = language
-            }
-        };
+                },
+                asr_options = new { language = language }
+            };
 
-        string json = JsonSerializer.Serialize(requestBody);
-        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
-        string requestUrl = $"{baseUrl}/chat/completions";
+            string json = JsonSerializer.Serialize(requestBody);
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/chat/completions");
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            ApplyAuth(request, apiKey, provider);
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-        ApplyAuth(request, apiKey, settings.AsrProvider);
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
 
-        var response = await _httpClient.SendAsync(request);
-        
-        response.EnsureSuccessStatusCode();
-        string responseJson = await response.Content.ReadAsStringAsync();
-        
-        using var doc = JsonDocument.Parse(responseJson);
-        string result = doc.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString() ?? string.Empty;
-
-        return result;
+            string responseJson = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(responseJson);
+            return doc.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString() ?? string.Empty;
+        }
     }
 
     public async Task StreamRecognizeAsync(
@@ -99,13 +120,26 @@ public class MiMoAsrService
     {
         var settings = Helpers.Settings.Instance.Current;
         string apiKey = !string.IsNullOrEmpty(customApiKey) ? customApiKey : settings.AsrApiKey;
-        if (string.IsNullOrEmpty(apiKey))
+        string provider = settings.AsrProvider;
+        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
+        string model = settings.AsrModelName;
+
+        if (string.IsNullOrEmpty(apiKey) && provider != "custom")
         {
             throw new InvalidOperationException("API Key is missing. Please configure it in settings.");
         }
 
+        if (provider == "openai" || (provider == "custom" && (baseUrl.Contains("audio") || model.Contains("whisper"))))
+        {
+            string result = await RecognizeAsync(base64Audio, mimeType, language, customApiKey);
+            if (!string.IsNullOrEmpty(result))
+            {
+                onResult(result);
+            }
+            return;
+        }
+
         string dataUrl = $"data:{mimeType};base64,{base64Audio}";
-        string model = settings.AsrModelName;
 
         var requestBody = new
         {
@@ -130,12 +164,11 @@ public class MiMoAsrService
         };
 
         string json = JsonSerializer.Serialize(requestBody);
-        string baseUrl = settings.AsrBaseUrl.TrimEnd('/');
         string requestUrl = $"{baseUrl}/chat/completions";
 
         var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-        ApplyAuth(request, apiKey, settings.AsrProvider);
+        ApplyAuth(request, apiKey, provider);
 
         using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();

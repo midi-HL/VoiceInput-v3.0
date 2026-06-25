@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace VoiceInput.Windows;
+namespace VoiceInput.AppWindows;
 
 public partial class HudWindow : Window
 {

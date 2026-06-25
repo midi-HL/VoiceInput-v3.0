@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 
-namespace VoiceInput.Windows;
+namespace VoiceInput.AppWindows;
 
 public partial class SettingsWindow : Window
 {

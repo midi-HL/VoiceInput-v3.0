@@ -6,10 +6,10 @@ namespace VoiceInput;
 
 public partial class App : Application
 {
-    private MainWindow? _mainWindow;
+    public MainWindow? _mainWindow;
     private KeyboardHook? _keyboardHook;
     private AudioCapture? _audioCapture;
-    private Windows.HudWindow? _hudWindow;
+    private AppWindows.HudWindow? _hudWindow;
 
     public App()
     {
@@ -35,7 +35,7 @@ public partial class App : Application
         _mainWindow?.DispatcherQueue.TryEnqueue(() =>
         {
             _hudWindow?.Close();
-            _hudWindow = new Windows.HudWindow();
+            _hudWindow = new AppWindows.HudWindow();
             _hudWindow.Activate();
             _hudWindow.StartRecording();
 
