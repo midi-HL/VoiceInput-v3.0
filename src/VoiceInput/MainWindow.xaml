@@ -64,6 +64,8 @@
         </Border>
 
         <!-- Right Content Area -->
-        <Frame Grid.Column="1" x:Name="ContentFrame" NavigationFailed="OnNavigationFailed" Padding="24" Background="#121212" />
+        <Border Grid.Column="1" Background="#121212" Padding="24">
+            <Frame x:Name="ContentFrame" NavigationFailed="OnNavigationFailed" />
+        </Border>
     </Grid>
 </Window>
